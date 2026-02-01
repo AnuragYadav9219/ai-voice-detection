@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException, Response
+from fastapi import FastAPI, Header, HTTPException, Body
 from pydantic import BaseModel, Field
 
 from utils.audio import decode_base64_audio
@@ -42,11 +42,11 @@ def detect_voice(
     return {"result": label, "confidence": confidence}
 
 
-@app.api_route(
-    "/honeypot", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-)
-async def honeypot(x_api_key: str = Header(None, alias="x-api-key")):
+@app.post("/honeypot")
+async def honeypot(
+    body: dict = Body(default={}), x_api_key: str = Header(None, alias="x-api-key")
+):
     if not x_api_key or x_api_key != API_KEY:
-        return Response(status_code=403)
+        return {"status": "unauthorized"}
 
-    return Response(status_code=200)
+    return {"status": "ok"}
