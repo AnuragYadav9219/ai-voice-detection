@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from utils.audio import decode_base64_audio
@@ -42,8 +42,8 @@ def detect_voice(
     return {"result": label, "confidence": confidence}
 
 
-@app.post("/honeypot")
-def honeypot(x_api_key: str = Header(None, alias="x-api-key")):
+@app.api_route("/honeypot", methods=["GET", "POST"])
+def honeypot(request: Request, x_api_key: str = Header(None, alias="x-api-key")):
     if not x_api_key:
         raise HTTPException(status_code=401, detail="API key missing")
 
