@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Header, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from utils.audio import decode_base64_audio
 from utils.features import extract_mfcc
@@ -9,15 +9,19 @@ API_KEY = "my-secret-key"
 
 app = FastAPI(title="AI Voice Detection API")
 
+
 class AudioRequest(BaseModel):
     language: str
-    audio_format: str
-    audio_base64: str
+    audio_format: str = Field(..., alias="audioFormat")
+    audio_base64: str = Field(..., alias="audioBase64")
+
+    class Config:
+        allow_population_by_field_name = True
+
 
 @app.post("/detect")
 def detect_voice(
-    request: AudioRequest,
-    x_api_key: str = Header(None, alias="x-api-key")
+    request: AudioRequest, x_api_key: str = Header(None, alias="x-api-key")
 ):
     if not x_api_key:
         raise HTTPException(status_code=401, detail="API key missing")
@@ -35,7 +39,4 @@ def detect_voice(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {
-        "result": label,
-        "confidence": confidence
-    }
+    return {"result": label, "confidence": confidence}
