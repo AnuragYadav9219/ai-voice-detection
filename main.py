@@ -40,3 +40,14 @@ def detect_voice(
         raise HTTPException(status_code=400, detail=str(e))
 
     return {"result": label, "confidence": confidence}
+
+
+@app.post("/honeypot")
+def honeypot(x_api_key: str = Header(None, alias="x-api-key")):
+    if not x_api_key:
+        raise HTTPException(status_code=401, detail="API key missing")
+
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Unauthorized access detected")
+
+    return {"status": "ok", "message": "Honeypot endpoint reached successfully"}
