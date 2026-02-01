@@ -43,9 +43,7 @@ def detect_voice(
 
 
 @app.post("/honeypot")
-async def honeypot(
-    body: dict = Body(default={}), x_api_key: str = Header(None, alias="x-api-key")
-):
+async def honeypot(x_api_key: str = Header(None, alias="x-api-key")):
     if not x_api_key or x_api_key != API_KEY:
         return {"status": "unauthorized"}
 
